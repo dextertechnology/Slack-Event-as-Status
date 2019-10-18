@@ -44,8 +44,6 @@ def set_my_slack_status():
     if not AUTHORIZATION:
         raise Exception("Authorization key not found")
 
-    print(get_left_time())
-
     setStatus = SetSlackStatus(
         "Bearer %s" % AUTHORIZATION,
         str(title),
