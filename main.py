@@ -21,15 +21,14 @@ AUTHORIZATION = os.getenv('BEARER_AUTH_KEY', None)
 
 
 def get_left_time():
-    now = datetime.datetime.now()
+    today_date = datetime.datetime.combine(
+        datetime.date.today(), datetime.datetime.max.time()
+    )
 
-    total_seconds = datetime.timedelta(days=1).total_seconds()
-    passed_seconds = datetime.timedelta(
-        hours=now.hour, minutes=now.minute, seconds=now.second
-    ).total_seconds()
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    total_utc = (today_date - epoch).total_seconds()
 
-    return total_seconds - passed_seconds
-
+    return total_utc + datetime.timedelta(hours=-5, minutes=-45).total_seconds()
 
 def set_my_slack_status():
     page_content = GetPageContent(
@@ -45,11 +44,12 @@ def set_my_slack_status():
     if not AUTHORIZATION:
         raise Exception("Authorization key not found")
 
-    
+    print(get_left_time())
 
     setStatus = SetSlackStatus(
         "Bearer %s" % AUTHORIZATION,
-        str(title)
+        str(title),
+        status_expiration = get_left_time()
     )
 
     return setStatus.set_status()
